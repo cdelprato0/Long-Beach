@@ -1,0 +1,24 @@
+`timescale 1ns/100ps
+module controlUnit(op, funct, regwrited, memtoregd, memwrited, branchd, alucontrold, alusrcd, regdstd);
+  input [5:0] op, funct;
+  output [2:0] alucontrold;
+  output regwrited, memtoregd, memwrited, branchd, alusrcd, regdstd;
+  
+  assign alucontrold = (op==0 & funct==36) ? 0:
+    (op==0 & funct ==37) ? 1:
+    ((op==0 & funct==32) | op==8 | op==35 | op==43) ? 2:
+    ((op==0 & funct==34) | op==4) ? 6:
+    (op==0 & funct==42) ? 7:
+    3'hx, //default alucontrol value
+    regwrited = (op==0 | op==8 | op==35) ? 1:0,
+    memtoregd = (op==35) ? 1:
+    (op==0 | op==8) ? 0: 1'bx, //default memtoreg value
+    memwrited = (op==43) ? 1:0,
+    branchd = (op==4) ? 1:0,
+    alusrcd = (op==8 | op==35 | op==43) ? 1:0,
+    regdstd = (op==0) ? 1: (op==8 | op==35) ? 0:
+    1'bx; //default regdst value
+endmodule
+
+    
+    

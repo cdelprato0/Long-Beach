@@ -1,0 +1,24 @@
+// Chaz Del Prato
+//CECS 341 - Lab 8
+`timescale 1ns/100ps
+`include "regfile.v"
+`include "se16.v"
+`include "controlUnit.v"
+
+`define datasize 32
+module ID_Stage(clk, instr, writeregw, resultw, regwritew, memtoregd, memwrited, branchd, alucontrold, alusrcd, regdstd, regwrited, rd1, rd2, signimme);
+  
+  input regwritew, clk;
+  input [`datasize-1:0] instr, resultw;
+  input [4:0] writeregw;
+  output [2:0] alucontrold;
+  output regwrited, memtoregd, memwrited, branchd, alusrcd, regdstd;
+  output [`datasize-1:0] rd1, rd2, signimme;
+  
+  assign regwritew = regwrited;
+  
+  controlUnit controlUnit(instr[31:26], instr[5:0], regwrited, memtoregd, memwrited, branchd, alucontrold, alusrcd, regdstd);
+  regfile rf(clk, regwritew, instr[25:21], instr[20:16], instr[15:11], writeregw, rd1, rd2);
+  se16 signExtend( instr[15:0], signimme);
+  
+endmodule

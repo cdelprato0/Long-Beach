@@ -1,0 +1,31 @@
+//Chaz Del Prato
+//CECS 341 - LAB 1
+`timescale 1ns/100ps
+module alu #(parameter width = 8)
+  (
+    input [width-1:0] a,b,
+    input [2:0] aluop,
+    output reg [width-1:0] y,
+    output reg c,n,z,p
+  );
+  
+  always @(a,b,aluop)
+    begin
+      {y,c,n,z,p} = 0;
+      case(aluop)
+        0: {c,y} = a + b;	//000 - add a + b
+        1: {c,y} = a + 1;	//001 - increment
+        2: y = a & b;		//010 - and a, b
+        3: y = a | b;		//011 - or a,b
+        4: y = a ^ b;		//100 - xor a,b
+        5: y = ~a;		//101 - bit-wise negate a
+        6: {c,y} = a << 1;	//110 - shift left 1 bit
+        7: y = 0;		//111 - output zero
+        default: y = 32'bZ;
+      endcase
+      n = y[width-1];	//if negative binary #
+      z = !y;		//logical negation
+      p = ^y;		//if odd # of 1's
+    end
+endmodule
+          

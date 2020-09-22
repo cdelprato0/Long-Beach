@@ -1,0 +1,84 @@
+`timescale 1ns/100ps
+`define datasize 32
+module t_ID_Stage();
+  reg clk, regwritew;
+  reg [`datasize-1:0] instr, resultw;
+  reg [4:0] writeregw;
+  wire [2:0] alucontrold;
+  wire regwrited, memtoregd, memwrited, branchd, alusrcd, regdstd;
+  wire [`datasize-1:0] rd1, rd2, signimme;
+  
+  integer i,x;
+  
+  ID_Stage dut(clk, instr, writeregw, resultw, regwritew, memtoregd, memwrited, branchd, alucontrold, alusrcd, regdstd, regwrited, rd1, rd2, signimme);
+  
+  always #5 clk = ~clk;
+  
+  initial begin
+    clk = 0;
+    
+    //perform instructions
+    //Test case 0: add $5, $3, $4
+    @(negedge clk)
+    instr = 32'h00642820;	//0000 0000 0110 0100 0010 1000 0010 0000
+    writeregw = 5'h5;
+    x=0;
+    @(posedge clk) #1 
+    displayControls(); 
+    //Test case 1: sub $8, $4, $5
+    @(negedge clk)
+    instr = 32'h00854022;	//0000 0000 1000 0101 0100 0000 0010 0010
+    writeregw = 5'h8; 
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    //Test case 2: slt $9, $4, $5
+    @(negedge clk)
+    instr = 32'h0085402A;  //0000 0000 1000 0101 0100 0000 0010 1010
+    writeregw = 5'h9;
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    //Test case 3: beq $10, $4, 2
+    @(negedge clk)
+    instr = 32'h11440002;	//0001 0001 0100 0100 0000 0000 0000 0010
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    //Test case 4: lw $11, 4($0)
+    @(negedge clk)
+    instr = 32'h8C0B0004;	//1000 1100 0000 1011 0000 0000 0000 0100
+    writeregw = 5'hb;
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    //Test case 5: sw $12, 4($0)
+    @(negedge clk)
+    instr = 32'hAC0C0004;	//1010 1100 0000 1100 0000 0000 0000 0100
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    //Test case 6: and $13, $4, $5
+    @(negedge clk)
+    instr = 32'h00856824;	//0000 0000 1000 0101 0110 1000 0010 0100
+    writeregw = 5'hd;
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    //Test case 7: or $14, $4, $5
+    @(negedge clk)
+    instr = 32'h00857025;	//0000 0000 1000 0101 0111 0000 0010 0101
+    writeregw = 5'he;
+    x=x+1;
+    @(posedge clk) #1
+    displayControls();
+    $finish;
+ 
+  end
+  
+  task displayControls;
+    begin
+      $display("Control Signals for test case %0d: %b", x, {regwrited, memtoregd, memwrited, branchd, alucontrold, alusrcd, regdstd, regwrited});
+    end
+  endtask
+endmodule
